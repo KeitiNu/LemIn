@@ -9,12 +9,95 @@ import (
 	"strings"
 )
 
-type Room struct {
-	ID          string
-	Type        string
-	X           int
-	Y           int
-	Connections []string
+func main() {
+
+	//Checks, if the arguments have been given correctly
+	if len(os.Args) != 2 {
+		fmt.Println("Usage: go run . [INPUTFILE]")
+		fmt.Println("EX: go run . example00.txt")
+	}
+
+	//Reads in the file from arguments and splits in into strings
+	fileName := "./examples/" + os.Args[1]
+	input, err := os.ReadFile(fileName)
+	errorCheck(err)
+	data := strings.Split(string(input), "\n")
+
+	//Finds the number of ants
+	_, roomData := numberOfAnts(data)
+
+	//Sorts the data into coordinate data and relation data
+	locationData, relationData := sortData(roomData)
+	coordinatesMap := mapRoomCoordinates(locationData)
+	originalMap := mapRoomConnections(relationData, coordinatesMap)
+
+	//TEST PRINT
+	fmt.Println(originalMap)
+
+	// for _, v := range originalMap {
+	// 	if len(v)<3 {
+	// 		fmt.Println(v)
+	// 	}
+	// }
+}
+
+
+//Breaks the remaining arguments to room info and relation info
+func sortData(roomData []string) ([]string, []string) {
+
+	var locationData []string
+
+	//finds data related to coordinates of the room
+	for i := 0; i < len(roomData); i++ {
+		if len(strings.Split(roomData[i], " ")) == 3 {
+			locationData = append(locationData, roomData[i])
+		} else if roomData[i][0] == '#' {
+			if roomData[i][1] == '#' {
+				locationData = append(locationData, roomData[i])
+			}
+		} else {
+			roomData = roomData[i:]
+			break
+		}
+	}
+
+	//finds room relations data
+	var realationData []string
+
+	for _, v := range roomData {
+		if len(strings.Split(v, "-")) == 2 {
+			realationData = append(realationData, v)
+		} else if v[0] == '#' && v[1] != '#' {
+
+		} else {
+			var err error = nil
+			err = errors.New("data in wrong format")
+			errorCheck(err)
+		}
+	}
+
+	return locationData, realationData
+}
+
+//Finds the number of ants
+func numberOfAnts(data []string) (int, []string) {
+	var nrOfAnts int
+	var roomData []string
+	var err error
+
+	for i := 0; i < len(data); i++ {
+		if data[i][0] != '#' {
+			nrOfAnts, err = strconv.Atoi(data[i])
+			if nrOfAnts < 1 {
+				err = errors.New("not enough ants")
+			}
+			errorCheck(err)
+			roomData = data[i+1:]
+			break
+		}
+	}
+
+	return nrOfAnts, roomData
 }
 
 //Returns an error if err!=nil
@@ -87,96 +170,34 @@ func mapRoomCoordinates(arguments []string) map[string][]int {
 	return roomMap
 }
 
-//WORK in progress
-func mapRoomConnections(arguments []string, coordinatesMap map[string][]int) {
+//maps connections between rooms
+func mapRoomConnections(rawData []string, coordinatesMap map[string][]int) map[string][]string{
+	var err error
 	originalMap := make(map[string][]string)
 
+	//adds room type as 1st string in slice
+	for key, v := range coordinatesMap {
+		switch v[0] {
+		case 0:
+			originalMap[key] = append(originalMap[key], "start")
+		case 2:
+			originalMap[key] = append(originalMap[key], "end")
+		default:
+			originalMap[key] = append(originalMap[key], "middle")
+		}
+	}
 
-	for _, v := range arguments {
+	//adds relations to the map
+	for _, v := range rawData {
 		connection := strings.Split(v, "-")
-		originalMap[connection[0]] = append(originalMap[connection[0]], connection[1])
-		originalMap[connection[1]] = append(originalMap[connection[1]], connection[0])
-	}
-
-	fmt.Println(originalMap)
-}
-
-func main() {
-
-	//Checks, if the arguments have been given correctly
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: go run . [INPUTFILE]")
-		fmt.Println("EX: go run . example00.txt")
-	}
-
-	//Reads in the file from arguments and splits in into strings
-	fileName := "./examples/" + os.Args[1]
-	input, err := os.ReadFile(fileName)
-	errorCheck(err)
-	data := strings.Split(string(input), "\n")
-
-	//Finds the number of ants
-	_, roomData := numberOfAnts(data)
-
-	//Sorts the data into coordinate data and relation data
-	locationData, relationData := sortData(roomData)
-
-	coordinatesMap := mapRoomCoordinates(locationData)
-
-	//In Work:
-	mapRoomConnections(relationData, coordinatesMap)
-}
-
-//Breaks the remaining arguments to room info and relation info
-func sortData(roomData []string) ([]string, []string) {
-
-	var locationData []string
-
-	//finds data related to coordinates of the room
-	for i := 0; i < len(roomData); i++ {
-		if len(strings.Split(roomData[i], " ")) == 3 {
-			locationData = append(locationData, roomData[i])
-		} else if roomData[i][0] == '#' {
-			if roomData[i][1] == '#' {
-				locationData = append(locationData, roomData[i])
-			}
-		} else {
-			roomData = roomData[i:]
-			break
-		}
-	}
-
-	//finds room relations data
-	var realationData []string
-
-	for _, v := range roomData {
-		if len(strings.Split(v, "-")) == 2 {
-			realationData = append(realationData, v)
-		} else if v[0] == '#' && v[1] != '#' {
-
-		} else {
-			var err error = nil
-			err = errors.New("data in wrong format")
+		if originalMap[connection[0]] != nil && originalMap[connection[1]] != nil{
+			originalMap[connection[0]] = append(originalMap[connection[0]], connection[1])
+			originalMap[connection[1]] = append(originalMap[connection[1]], connection[0])
+		}else{
+			err = errors.New("missing location")
 			errorCheck(err)
 		}
+
 	}
-
-	return locationData, realationData
-}
-
-func numberOfAnts(data []string) (int, []string){
-	var nrOfAnts int
-	var roomData []string
-	var err error
-
-	for i := 0; i < len(data); i++ {
-		if data[i][0] != '#' {
-			nrOfAnts, err = strconv.Atoi(data[i])
-			errorCheck(err)
-			roomData = data[i+1:]
-			break
-		}
-	}
-
-	return nrOfAnts, roomData
+	return originalMap
 }
