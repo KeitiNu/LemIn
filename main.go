@@ -29,18 +29,47 @@ func main() {
 	//Sorts the data into coordinate data and relation data
 	locationData, relationData := sortData(roomData)
 	coordinatesMap := mapRoomCoordinates(locationData)
-	originalMap := mapRoomConnections(relationData, coordinatesMap)
-
+	originalMap := mapRoomConnections(relationData, coordinatesMap) //unsorted map of rooms and relations
+	croppedMap := removeDeadEnds(originalMap)
 	//TEST PRINT
-	fmt.Println(originalMap)
+	fmt.Println("Main:", croppedMap)
 
-	// for _, v := range originalMap {
-	// 	if len(v)<3 {
-	// 		fmt.Println(v)
-	// 	}
-	// }
 }
 
+//removes dead ends from function
+func removeDeadEnds(rawMap map[string][]string) map[string][]string {
+	fmt.Println("rawMap: ", rawMap)
+	var err error
+
+	for key, value := range rawMap {
+		if len(value) == 1 {
+			if value[0] == "start" || value[0] == "end" {
+				err = errors.New("missing a route to end or start")
+				errorCheck(err)
+			} else {
+				delete(rawMap, key)
+			}
+		} else if len(value) == 2 && value[0] != "start" && value[0] != "end" {
+			for key1, values := range rawMap {
+				for i, v := range values {
+					if v == key {
+						values = remove(values, i)
+						rawMap[key1] = values
+					}
+				}
+			}
+			delete(rawMap, key)
+			removeDeadEnds(rawMap)
+		}
+	}
+
+	return rawMap
+}
+
+//removes a named value from string
+func remove(slice []string, s int) []string {
+	return append(slice[:s], slice[s+1:]...)
+}
 
 //Breaks the remaining arguments to room info and relation info
 func sortData(roomData []string) ([]string, []string) {
@@ -171,7 +200,7 @@ func mapRoomCoordinates(arguments []string) map[string][]int {
 }
 
 //maps connections between rooms
-func mapRoomConnections(rawData []string, coordinatesMap map[string][]int) map[string][]string{
+func mapRoomConnections(rawData []string, coordinatesMap map[string][]int) map[string][]string {
 	var err error
 	originalMap := make(map[string][]string)
 
@@ -190,10 +219,10 @@ func mapRoomConnections(rawData []string, coordinatesMap map[string][]int) map[s
 	//adds relations to the map
 	for _, v := range rawData {
 		connection := strings.Split(v, "-")
-		if originalMap[connection[0]] != nil && originalMap[connection[1]] != nil{
+		if originalMap[connection[0]] != nil && originalMap[connection[1]] != nil {
 			originalMap[connection[0]] = append(originalMap[connection[0]], connection[1])
 			originalMap[connection[1]] = append(originalMap[connection[1]], connection[0])
-		}else{
+		} else {
 			err = errors.New("missing location")
 			errorCheck(err)
 		}
