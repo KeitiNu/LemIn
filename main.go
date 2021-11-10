@@ -1,12 +1,14 @@
 package main
 
 import (
+
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"strings"
+	"lem-in/path"
 )
 
 func main() {
@@ -34,6 +36,8 @@ func main() {
 	//TEST PRINT
 	fmt.Println("Main:", croppedMap)
 
+	theWay := path.Path()
+	fmt.Println(theWay)
 }
 
 //removes dead ends from function
