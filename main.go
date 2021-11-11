@@ -226,7 +226,6 @@ func mapRoomConnections(rawData []string, coordinatesMap map[string][]int) map[s
 			err = errors.New("missing location")
 			errorCheck(err)
 		}
-
 	}
 	return originalMap
 }
