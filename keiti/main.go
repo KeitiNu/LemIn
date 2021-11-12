@@ -8,7 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"lem-in/path"
+	// "lem-in/path"
 )
 
 func main() {
@@ -35,9 +35,6 @@ func main() {
 	croppedMap := removeDeadEnds(originalMap)
 	//TEST PRINT
 	fmt.Println("Main:", croppedMap)
-
-	theWay := path.Path()
-	fmt.Println(theWay)
 }
 
 //removes dead ends from function
