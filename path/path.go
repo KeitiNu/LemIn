@@ -27,8 +27,14 @@ func main() {
 			break
 		}
 	}
-
-	fmt.Println(filter(ants))
+	way, _ := filter(ants)
+	fmt.Println(way)
+	if len(way) == 0 {
+		fmt.Println(way)
+	}
+	// fmt.Println(way)
+	// fmt.Println(distribution)
+	// return way, distribution
 }
 
 // findWay takes an anthill layout and gives us all the possible paths to the end
@@ -57,6 +63,7 @@ func findWay(room string, way []string) {
 
 // takes two roads, eachs if each room is unique
 func filter(ants int) ([][]string, []int) {
+	var rightMoves int
 	var rightDistribution []int
 	var rightWay [][]string
 
@@ -87,10 +94,12 @@ func filter(ants int) ([][]string, []int) {
 		way = findBranchingPaths(short, way)
 
 		if len(rightWay) == 0 {
-			_, rightDistribution = moveAnts(way)
-			rightWay = way
+			rightWay, rightDistribution, rightMoves = formula(way, ants)
 		} else {
-			rightWay, rightDistribution = compare(rightWay, way, ants)
+			newWay, newDistribution, newMoves := formula(way, ants)
+			if newMoves > rightMoves {
+				rightDistribution, rightMoves, rightWay = newDistribution, newMoves, newWay
+			}
 		}
 	}
 
@@ -158,7 +167,7 @@ func moveAnts(way [][]string) (int, []int) {
 }
 
 // a formula to send the right amount of ants down each path, return the distribution and the move count
-func formula(option [][]string, ants int) ([]int, int) {
+func formula(option [][]string, ants int) ([][]string, []int, int) {
 	finished, distribution := moveAnts(option)
 	roadCount := len(option)
 
@@ -167,9 +176,9 @@ func formula(option [][]string, ants int) ([]int, int) {
 	// if it's the same then we got off easy.
 	if finished > ants {
 		moves := len(option[len(option)-1])
-		return subtraction(ants, finished, distribution, moves)
+		return subtraction(option, ants, finished, distribution, moves)
 	} else if finished == ants {
-		return distribution, len(option[len(option)-1])
+		return option, distribution, len(option[len(option)-1])
 	}
 	
 	// start : we send out the beginning path of unevenly distributed ants
@@ -195,21 +204,21 @@ func formula(option [][]string, ants int) ([]int, int) {
 		}
 	}
 
-	return distribution, moves
+	return option, distribution, moves
 }
 
 // if the way we distributed the ants is greater than the amount of ants we have
 // then we start subtracting them from te roads
-func subtraction(ants int, finished int, distribution[]int, moves int) ([]int, int) {
+func subtraction(option [][]string, ants int, finished int, distribution[]int, moves int) ([][]string, []int, int) {
 	for i := 0; i < len(distribution); i++ {
 		distribution[i] -= 1
 		finished--
 
 		// need to make it soo that the option also loses it's value in that case...
 		if distribution[i] == 0 {
-			temp := distribution[:i]
-			temp = append(temp, distribution[i+1:]...)
-			distribution = temp
+			tempDis, tempWay := distribution[:i], option[:i]
+			tempDis, tempWay = append(tempDis, distribution[i+1:]...), append(tempWay, option[i+1:]...)
+			distribution, option = tempDis, tempWay
 			i--
 		}
 
@@ -217,11 +226,11 @@ func subtraction(ants int, finished int, distribution[]int, moves int) ([]int, i
 			if i == len(distribution) - 1 {
 				moves--
 			}
-			return distribution, moves
+			return option, distribution, moves
 		}
 	}
 	moves--
-	return subtraction(ants, finished, distribution, moves)
+	return subtraction(option, ants, finished, distribution, moves)
 }
 
 	/*
