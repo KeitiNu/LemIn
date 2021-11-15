@@ -1,4 +1,4 @@
-package main
+package path
 
 import (
 	"fmt"
@@ -10,8 +10,9 @@ var (
 )
 
 // Path takes in an anthill layout gives back the most optimal routh to the end
-// func Path() [][]string {
-func main() {
+// func Path() 
+func Path(data map[string][]string, ants int) ([][]string, []int) {
+	/*
 	// 0 - 1/2/3 - 4 - 5
 	ants := 10
 	anthill["0"] = []string{"start", "1", "2", "3"}
@@ -20,6 +21,9 @@ func main() {
 	anthill["3"] = []string{"middle", "0", "4"}
 	anthill["4"] = []string{"middle", "1", "2", "3", "5"}
 	anthill["5"] = []string{"end", "4"}
+	*/
+
+	anthill = data
 
 	for start, options := range anthill {
 		if options[0] == "start" {
@@ -27,12 +31,10 @@ func main() {
 			break
 		}
 	}
+
 	way, distribution := filter(ants)
-	fmt.Println(distribution)
-	if len(way) == 0 {
-		fmt.Println(way)
-	}
-	// return way, distribution
+	
+	return way, distribution
 }
 
 // findWay takes an anthill layout and gives us all the possible paths to the end
