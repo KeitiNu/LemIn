@@ -27,13 +27,11 @@ func main() {
 			break
 		}
 	}
-	way, _ := filter(ants)
-	fmt.Println(way)
+	way, distribution := filter(ants)
+	fmt.Println(distribution)
 	if len(way) == 0 {
 		fmt.Println(way)
 	}
-	// fmt.Println(way)
-	// fmt.Println(distribution)
 	// return way, distribution
 }
 
@@ -108,11 +106,12 @@ func filter(ants int) ([][]string, []int) {
 
 func findBranchingPaths(short []string, way [][]string) [][]string {
 	// in both middles, start and end get cut off for all roads share that
-	middle1 := [][]string{short[1 : len(short)-2]}
+	middle1 := [][]string{short[1 : len(short)-1]}
 
 	for _, long := range paths {
-		middle2 := long[1 : len(long)-2]
+		middle2 := long[1 : len(long)-1]
 		var breaker bool
+		fmt.Printf("middle2 : %v\n", middle2)
 
 		for i, path := range middle1 {
 			// compared the paths
@@ -140,7 +139,6 @@ func findBranchingPaths(short []string, way [][]string) [][]string {
 			}
 		}
 	}
-
 	return way
 }
 
