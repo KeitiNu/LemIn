@@ -114,7 +114,7 @@ func findBranchingPaths(short []string, way [][]string) [][]string {
 		middle2 := long[1 : len(long)-2]
 		var breaker bool
 
-		for _, path := range middle1 {
+		for i, path := range middle1 {
 			// compared the paths
 			for _, room1 := range path {
 				for _, room2 := range middle2 {
@@ -133,9 +133,11 @@ func findBranchingPaths(short []string, way [][]string) [][]string {
 				break
 			}
 
-			// If we made it all the way through without there being any matching rooms, then
-			way = append(way, long)
-			middle1 = append(middle1, middle2) // middle2 get appended so future roads will not cross it's path
+			if i == len(middle1)-1 {
+				// If we made it all the way through without there being any matching rooms, then
+				way = append(way, long)
+				middle1 = append(middle1, middle2) // middle2 get appended so future roads will not cross it's path
+			}
 		}
 	}
 
