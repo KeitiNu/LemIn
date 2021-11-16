@@ -41,13 +41,13 @@ func Path(data map[string][]string, ants int) ([][]string, []int) {
 }
 
 // findWay takes an anthill layout and gives us all the possible paths to the end
-func findWay(way []string) ([][]string) {
+func findWay(way []string) {
 	options := anthill[way[len(way)-1]]
 
 	// if we're at the end then add this path to the path list
 	if options[0] == "end" {
 		paths = append(paths, way)
-		
+
 		fmt.Println(paths)
 		fmt.Println()
 	} else {
