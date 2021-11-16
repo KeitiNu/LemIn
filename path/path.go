@@ -25,7 +25,7 @@ func Path(data map[string][]string, ants int) ([][]string, []int) {
 
 	for start, options := range anthill {
 		if options[0] == "start" {
-			paths = findWay([]string{start}, [][]string{})
+			findWay([]string{start})
 			break
 		}
 	}
@@ -41,13 +41,14 @@ func Path(data map[string][]string, ants int) ([][]string, []int) {
 }
 
 // findWay takes an anthill layout and gives us all the possible paths to the end
-func findWay(way []string, amazingPaths [][]string) [][]string {
+func findWay(way []string) ([][]string) {
 	options := anthill[way[len(way)-1]]
 
 	// if we're at the end then add this path to the path list
 	if options[0] == "end" {
-		amazingPaths = append(amazingPaths, way)
-		fmt.Println(amazingPaths)
+		paths = append(paths, way)
+		
+		fmt.Println(paths)
 		fmt.Println()
 	} else {
 		// skipping over the room type, we try to find a room we haven't travled yet
@@ -61,11 +62,9 @@ func findWay(way []string, amazingPaths [][]string) [][]string {
 					continue loop
 				}
 			}
-			way = append(way, options[i])
-			amazingPaths = findWay(way, amazingPaths)
+			findWay(append(way, options[i]))
 		}
 	}
-	return amazingPaths
 }
 
 // takes two roads, eachs if each room is unique
