@@ -114,7 +114,7 @@ func filter(ants int) ([][]string, []int) {
 			rightWay, rightDistribution, rightMoves = formula(way, ants)
 		} else {
 			newWay, newDistribution, newMoves := formula(way, ants)
-			if newMoves > rightMoves {
+			if newMoves < rightMoves {
 				rightDistribution, rightMoves, rightWay = newDistribution, newMoves, newWay
 			}
 		}
