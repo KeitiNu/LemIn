@@ -34,18 +34,16 @@ func main() {
 	croppedMap := removeDeadEnds(originalMap)
 	//TEST PRINT
 	fmt.Println("Main:", croppedMap)
-	fmt.Println()
 
 	numAnts, _ := strconv.Atoi(data[0])
 	path, distribution := path.Path(croppedMap, numAnts)
-	fmt.Println()
 	fmt.Println(path)
 	fmt.Println(distribution)
 }
 
 //removes dead ends from function
 func removeDeadEnds(rawMap map[string][]string) map[string][]string {
-	// fmt.Println("rawMap: ", rawMap)
+	fmt.Println("rawMap: ", rawMap)
 	var err error
 
 	for key, value := range rawMap {
@@ -233,6 +231,7 @@ func mapRoomConnections(rawData []string, coordinatesMap map[string][]int) map[s
 			err = errors.New("missing location")
 			errorCheck(err)
 		}
+
 	}
 	return originalMap
 }
