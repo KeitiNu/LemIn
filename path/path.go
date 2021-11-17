@@ -23,6 +23,8 @@ func Path(data map[string][]string, ants int) ([][]string, []int) {
 
 	anthill = data
 
+	fmt.Println(anthill)
+
 	for start, options := range anthill {
 		if options[0] == "start" {
 			findWay([]string{start})
