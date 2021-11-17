@@ -1,6 +1,8 @@
 package path
 
-import "fmt"
+import (
+	"fmt"
+)
 
 var (
 	anthill = make(map[string][]string)
@@ -170,7 +172,7 @@ func formula(option [][]string, ants int) ([][]string, []int, int) {
 		}
 	}
 
-	fmt.Printf("raw distribution: %v\n", distribution)
+	fmt.Printf("way: %v\ndistribution: %v\nmoves: %v\n", option, distribution, moves)
 
 	// if the way we distributed the ants is greater than the amount of ants we have...
 	// ...then we're fucked...
@@ -187,10 +189,11 @@ func formula(option [][]string, ants int) ([][]string, []int, int) {
 	// start : we send out the beginning path of unevenly distributed ants
 	ants = ants - finished
 
-	
+
 
 	// middle/end : now that the uneven part is done then we
 	moves += ants / roadCount
+	fmt.Printf("move += ants/roadcount: %v\n", moves)
 	for i := range distribution {
 		distribution[i] += ants / roadCount
 	}
@@ -199,6 +202,7 @@ func formula(option [][]string, ants int) ([][]string, []int, int) {
 	// end : if theres still some ants lingering then we do one extra move for them
 	if ants > 0 {
 		moves++
+		fmt.Printf("move++ : %v\n", moves)
 		for i := range distribution {
 			distribution[i] += 1
 			ants--
@@ -208,12 +212,7 @@ func formula(option [][]string, ants int) ([][]string, []int, int) {
 		}
 	}
 
-	// var sum int
-	// for _, v := range distribution {
-	// 	sum += v
-	// }
-	fmt.Printf("way : %v\n", option)
-	fmt.Printf("distribution: %v\n\n", distribution)
+	fmt.Println()
 
 	return option, distribution, moves
 }
