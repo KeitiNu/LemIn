@@ -185,6 +185,8 @@ func formula(option [][]string, ants int) ([][]string, []int, int) {
 	// start : we send out the beginning path of unevenly distributed ants
 	ants = ants - finished
 
+	
+
 	// middle/end : now that the uneven part is done then we
 	moves += ants / roadCount
 	for i := range distribution {
@@ -227,9 +229,8 @@ func moveAnts(way [][]string) (int, []int) {
 	longestPath := len(way[len(way)-1]) // length of the longest path
 
 	for _, arr := range way {
-		length := len(arr)
-		if length > longestPath {
-			longestPath = length
+		if len(arr) > longestPath {
+			longestPath = len(arr)
 		}
 	}
 
