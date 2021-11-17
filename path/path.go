@@ -30,17 +30,13 @@ func Path(data map[string][]string, ants int) ([][]string, []int) {
 		}
 	}
 
-	// fmt.Println()
-	// for _, arr := range paths {
-	// 	fmt.Println(arr)
-	// }
-
 	way, distribution := filter(ants)
 
 	return way, distribution
 }
 
-// findWay takes an anthill layout and gives us all the possible paths to the end
+// findWay takes an anthill layout and gives us all the possible paths to the end.
+// Creadit to Zane who helped fix the info overwritting problem.
 func findWay(way []string) {
 	options := anthill[way[len(way)-1]]
 
@@ -48,8 +44,8 @@ func findWay(way []string) {
 	if options[0] == "end" {
 		paths = append(paths, way)
 
-		fmt.Println(paths)
-		fmt.Println()
+		// fmt.Printf("Found %v\n", paths)
+		// fmt.Println()
 	} else {
 		// skipping over the room type, we try to find a room we haven't travled yet
 		// if we find such a room then we call findWay with the room info and traveled path
@@ -62,16 +58,25 @@ func findWay(way []string) {
 					continue loop
 				}
 			}
-			findWay(append(way, options[i]))
+			// fmt.Printf("Third %v\n", paths)
+			newPath := append(way, options[i])
+			test := make([]string, len(newPath))
+			for i := 0; i < len(newPath); i++ {
+				test[i] = newPath[i]
+			}
+			findWay(test)
+
 		}
 	}
 }
 
 // takes two roads, eachs if each room is unique
 func filter(ants int) ([][]string, []int) {
-	var rightMoves int
-	var rightDistribution []int
-	var rightWay [][]string
+	var (
+		rightWay          [][]string
+		rightDistribution []int
+		rightMoves        int
+	)
 
 	// if we only found one path, that's that
 	if len(paths) == 1 {
@@ -90,9 +95,11 @@ func filter(ants int) ([][]string, []int) {
 
 	// searching for the right way...
 	for _, short := range paths {
-		// if we've ran out of short roads, the program will end
-		if len(short) != len(paths[0]) {
-			break
+
+		// if we find a road that's only 2 long,
+		// then we have a path that connects straight to the end
+		if len(short) == 2 {
+			return [][]string{short}, []int{ants}
 		}
 
 		// way is the path that will store the current path
@@ -149,43 +156,21 @@ func findBranchingPaths(short []string, way [][]string) [][]string {
 	return way
 }
 
-// moveAnts takes in a given way and the number of ants
-// and return how many ants finished base on how long
-// it'll take for the ant on the longest path to get home
-// and how those ant are divided to each road.
-func moveAnts(way [][]string) (int, []int) {
-	if len(way) == 1 {
-		return 1, []int{1}
-	}
-
-	var list []int                      // the number of ants that are sent down each path
-	var antsfinished int                // ants that finish by x number of moves
-	longestPath := len(way[len(way)-1]) // length of the longest path
-	antsfinished++
-
-	for i := 0; i < len(way)-2; i++ {
-		antsfinished += longestPath - len(way[i])
-		list = append(list, longestPath-len(way[i]))
-	}
-
-	list = append(list, 1)
-
-	return antsfinished, list
-}
-
 // a formula to send the right amount of ants down each path, return the distribution and the move count
 func formula(option [][]string, ants int) ([][]string, []int, int) {
 	finished, distribution := moveAnts(option)
 	roadCount := len(option)
 
+	fmt.Printf("raw distribution: %v\n", distribution)
+
 	// if the way we distributed the ants is greater than the amount of ants we have...
 	// ...then we're fucked...
 	// if it's the same then we got off easy.
 	if finished > ants {
-		fmt.Printf("%v > %v", finished, ants)
+		// fmt.Printf("%v > %v\n", finished, ants)
 
-		moves := len(option[len(option)-1])
-		return subtraction(option, ants, finished, distribution, moves)
+		// moves := len(option[len(option)-1])
+		// return subtraction(option, ants, finished, distribution, moves)
 	} else if finished == ants {
 		return option, distribution, len(option[len(option)-1])
 	}
@@ -213,9 +198,41 @@ func formula(option [][]string, ants int) ([][]string, []int, int) {
 		}
 	}
 
+	// var sum int
+	// for _, v := range distribution {
+	// 	sum += v
+	// }
+	fmt.Printf("way : %v\n", option)
+	fmt.Printf("distribution: %v\n", distribution)
+
 	return option, distribution, moves
 }
 
+// moveAnts takes in a given way and the number of ants
+// and return how many ants finished base on how long
+// it'll take for the ant on the longest path to get home
+// and how those ant are divided to each road.
+func moveAnts(way [][]string) (int, []int) {
+	if len(way) == 1 {
+		return len(way[0]), []int{1}
+	}
+
+	var distribution []int              // the number of ants that are sent down each path
+	var antsfinished int                // ants that finish by x number of moves
+	longestPath := len(way[len(way)-1]) // length of the longest path
+	antsfinished++
+
+	for i := 0; i < len(way)-2; i++ {
+		antsfinished += longestPath - len(way[i]) + 1
+		distribution = append(distribution, longestPath-len(way[i])+1)
+	}
+
+	distribution = append(distribution, 1)
+
+	return antsfinished, distribution
+}
+
+/*
 // if the way we distributed the ants is greater than the amount of ants we have
 // then we start subtracting them from te roads
 func subtraction(option [][]string, ants int, finished int, distribution []int, moves int) ([][]string, []int, int) {
@@ -236,11 +253,16 @@ func subtraction(option [][]string, ants int, finished int, distribution []int, 
 				moves--
 			}
 			return option, distribution, moves
+		} else if finished < ants {
+			fmt.Println("error in subtraction")
+			os.Exit(0)
 		}
 	}
 	moves--
-	return subtraction(option, ants, finished, distribution, moves)
+	return option, distribution, moves
+	// return subtraction(option, ants, finished, distribution, moves)
 }
+*/
 
 /*
 	ants = 100 - 3 = 97

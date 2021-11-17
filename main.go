@@ -33,14 +33,15 @@ func main() {
 	originalMap := mapRoomConnections(relationData, coordinatesMap) //unsorted map of rooms and relations
 	croppedMap := removeDeadEnds(originalMap)
 	//TEST PRINT
-	fmt.Println("Main:", croppedMap)
-	fmt.Println()
+	// fmt.Println("Main:", croppedMap)
+	// fmt.Println()
 
 	numAnts, _ := strconv.Atoi(data[0])
 	path, distribution := path.Path(croppedMap, numAnts)
 	fmt.Println()
 	fmt.Println(path)
 	fmt.Println(distribution)
+	fmt.Printf("number of ants: %v", numAnts)
 }
 
 //removes dead ends from function
