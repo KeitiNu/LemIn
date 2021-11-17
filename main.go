@@ -41,6 +41,7 @@ func main() {
 	fmt.Println(path)
 	fmt.Println(distribution)
 	fmt.Printf("number of ants: %v", numAnts)
+	fmt.Println()
 }
 
 //removes dead ends from function
