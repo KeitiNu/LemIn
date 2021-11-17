@@ -87,16 +87,6 @@ func filter(ants int) ([][]string, []int) {
 		return paths, []int{ants}
 	}
 
-	// sort the list, the shortest path at the front
-	for i := 1; i < len(paths); i++ {
-		if i < 1 {
-			continue
-		} else if len(paths[i-1]) > len(paths[i]) {
-			paths[i], paths[i-1] = paths[i-1], paths[i]
-			i = i - 2
-		}
-	}
-
 	// searching for the right way...
 	for _, short := range paths {
 
