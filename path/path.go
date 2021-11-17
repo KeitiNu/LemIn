@@ -160,6 +160,13 @@ func findBranchingPaths(short []string, way [][]string) [][]string {
 func formula(option [][]string, ants int) ([][]string, []int, int) {
 	finished, distribution := moveAnts(option)
 	roadCount := len(option)
+	moves := len(option[len(option)-1])
+
+	for _, arr := range option {
+		if len(arr) > moves {
+			moves = len(arr)
+		}
+	}
 
 	fmt.Printf("raw distribution: %v\n", distribution)
 
@@ -172,19 +179,18 @@ func formula(option [][]string, ants int) ([][]string, []int, int) {
 		// moves := len(option[len(option)-1])
 		// return subtraction(option, ants, finished, distribution, moves)
 	} else if finished == ants {
-		return option, distribution, len(option[len(option)-1])
+		return option, distribution, moves
 	}
 
 	// start : we send out the beginning path of unevenly distributed ants
-	moves := len(option[len(option)-1])
 	ants = ants - finished
 
 	// middle/end : now that the uneven part is done then we
 	moves += ants / roadCount
-	ants = ants % roadCount
 	for i := range distribution {
 		distribution[i] += ants / roadCount
 	}
+	ants = ants % roadCount
 
 	// end : if theres still some ants lingering then we do one extra move for them
 	if ants > 0 {
@@ -203,31 +209,34 @@ func formula(option [][]string, ants int) ([][]string, []int, int) {
 	// 	sum += v
 	// }
 	fmt.Printf("way : %v\n", option)
-	fmt.Printf("distribution: %v\n", distribution)
+	fmt.Printf("distribution: %v\n\n", distribution)
 
 	return option, distribution, moves
 }
 
-// moveAnts takes in a given way and the number of ants
-// and return how many ants finished base on how long
-// it'll take for the ant on the longest path to get home
+// moveAnts takes in a given way
+// and return the base amout of ants that finish
 // and how those ant are divided to each road.
 func moveAnts(way [][]string) (int, []int) {
 	if len(way) == 1 {
-		return len(way[0]), []int{1}
+		return 1, []int{1}
 	}
 
 	var distribution []int              // the number of ants that are sent down each path
 	var antsfinished int                // ants that finish by x number of moves
 	longestPath := len(way[len(way)-1]) // length of the longest path
-	antsfinished++
 
-	for i := 0; i < len(way)-2; i++ {
+	for _, arr := range way {
+		length := len(arr)
+		if length > longestPath {
+			longestPath = length
+		}
+	}
+
+	for i := 0; i < len(way); i++ {
 		antsfinished += longestPath - len(way[i]) + 1
 		distribution = append(distribution, longestPath-len(way[i])+1)
 	}
-
-	distribution = append(distribution, 1)
 
 	return antsfinished, distribution
 }
