@@ -25,7 +25,7 @@ func main() {
 	data := strings.Split(string(input), "\n")
 
 	//Finds the number of ants
-	_, roomData := numberOfAnts(data)
+	numAnts, roomData := numberOfAnts(data)
 
 	//Sorts the data into coordinate data and relation data
 	locationData, relationData := sortData(roomData)
@@ -36,7 +36,6 @@ func main() {
 	// fmt.Println("Main:", croppedMap)
 	// fmt.Println()
 
-	numAnts, _ := strconv.Atoi(data[0])
 	path, distribution := path.Path(croppedMap, numAnts)
 	fmt.Println()
 	fmt.Println(path)
