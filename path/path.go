@@ -186,34 +186,37 @@ func formula(endroom string, option [][]string, ants int) ([][]string, []int, in
 	// start : we send out the beginning path of unevenly distributed ants
 	ants = ants - finished
 
-	fmt.Println(ants)
 
 	// middle/end : now that the uneven part is done then we
 	moves += ants / roadCount
-	for i := range distribution {
-		if len(distribution) == 1 {
-			distribution[i] += ants / roadCount
-		} else {
-			distribution[i] += ants/roadCount + 1
-		}
-	}
-	ants = ants % roadCount
+    base := make([]int, len(distribution))
+    copy(base, distribution)
 
-	fmt.Println(ants)
-	fmt.Println()
+    if len(distribution) == 1 {
+        distribution[0] += ants / roadCount
+    } else {
+        i := 0
+        for i < len(distribution) {
+            for j := 0; j < base[i]; j++ {
+                distribution[i]++
+                ants--
+				if ants == 0 {
+                    break
+                }
+            }
 
-	// end : if theres still some ants lingering then we do one extra move for them
-	if ants > 0 {
-		moves++
-		for i := len(distribution) - 1; i > -1; i-- {
-			distribution[i] += 1
-			ants--
-			if ants == 0 {
-				break
-			}
-
-		}
-	}
+            if ants >= 1 {
+                if i == len(distribution)-1 {
+					moves++
+                    i = 0
+                } else {
+                    i++
+                }
+            } else if ants == 0 {
+                break
+            }
+        }
+    }
 
 	return option, distribution, moves
 }
