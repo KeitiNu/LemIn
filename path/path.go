@@ -1,7 +1,5 @@
 package path
 
-import "fmt"
-
 var (
 	anthill = make(map[string][]string)
 	paths   [][]string
@@ -10,17 +8,6 @@ var (
 // Path takes in an anthill layout gives back the most optimal route to the end
 // func Path()
 func Path(data map[string][]string, ants int) ([][]string, []int) {
-	/*
-		// 0 - 1/2/3 - 4 - 5
-		ants := 10
-		anthill["0"] = []string{"start", "1", "2", "3"}
-		anthill["1"] = []string{"middle", "0", "4"}
-		anthill["2"] = []string{"middle", "0", "4"}
-		anthill["3"] = []string{"middle", "0", "4"}
-		anthill["4"] = []string{"middle", "1", "2", "3", "5"}
-		anthill["5"] = []string{"end", "4"}
-	*/
-
 	anthill = data
 
 	for start, options := range anthill {
@@ -165,9 +152,6 @@ func formula(endroom string, option [][]string, ants int) ([][]string, []int, in
 	roadCount := len(option)
 	moves := len(option[len(option)-1])
 
-	fmt.Println(option)
-	fmt.Println(distribution)
-
 	for _, arr := range option {
 		if len(arr) > moves {
 			moves = len(arr)
@@ -186,37 +170,36 @@ func formula(endroom string, option [][]string, ants int) ([][]string, []int, in
 	// start : we send out the beginning path of unevenly distributed ants
 	ants = ants - finished
 
-
 	// middle/end : now that the uneven part is done then we
 	moves += ants / roadCount
-    base := make([]int, len(distribution))
-    copy(base, distribution)
+	base := make([]int, len(distribution))
+	copy(base, distribution)
 
-    if len(distribution) == 1 {
-        distribution[0] += ants / roadCount
-    } else {
-        i := 0
-        for i < len(distribution) {
-            for j := 0; j < base[i]; j++ {
-                distribution[i]++
-                ants--
+	if len(distribution) == 1 {
+		distribution[0] += ants / roadCount
+	} else {
+		i := 0
+		for i < len(distribution) {
+			for j := 0; j < base[i]; j++ {
+				distribution[i]++
+				ants--
 				if ants == 0 {
-                    break
-                }
-            }
+					break
+				}
+			}
 
-            if ants >= 1 {
-                if i == len(distribution)-1 {
+			if ants >= 1 {
+				if i == len(distribution)-1 {
 					moves++
-                    i = 0
-                } else {
-                    i++
-                }
-            } else if ants == 0 {
-                break
-            }
-        }
-    }
+					i = 0
+				} else {
+					i++
+				}
+			} else if ants == 0 {
+				break
+			}
+		}
+	}
 
 	return option, distribution, moves
 }
