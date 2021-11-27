@@ -32,21 +32,61 @@ func main() {
 	coordinatesMap := mapRoomCoordinates(locationData)
 	originalMap := mapRoomConnections(relationData, coordinatesMap) //unsorted map of rooms and relations
 	croppedMap := removeDeadEnds(originalMap)
-	//TEST PRINT
-	// fmt.Println("Main:", croppedMap)
-	// fmt.Println()
 
+	//FINAL PRINTING
+
+	//Info about the paths and distribution from path.go
 	path, distribution := path.Path(croppedMap, numAnts)
-	fmt.Println()
-	fmt.Println(path)
-	fmt.Println(distribution)
-	fmt.Printf("number of ants: %v", numAnts)
-	fmt.Println()
+
+	var ants [][]int
+	antNr := 1
+	//Creating a slice into var ants[][] that contains integers of how many ants there are
+	for i := 0; i < len(distribution); i++ {
+		ants = append(ants, []int{})
+		for j := 0; j < distribution[i]; j++ {
+			ants[i] = append(ants[i], antNr)
+			antNr++
+		}
+	}
+
+	biggest := 0
+	//Assigning the largest value from var ants to var biggest
+	for i := 0; i < len(ants); i++ {
+		if len(ants[i]) > biggest {
+			biggest = len(ants[i])
+		}
+	}
+
+	remaining := numAnts
+	//Creating a infite loop that prints the required output and ends when var remaining is equal to 0
+	for i := 1; i > 0; i++ {
+		whichANT := 0
+		for k := 0; k < biggest; k++ {
+			for j := 0; j < len(ants); j++ {
+				if len(ants[j]) > whichANT && len(path[j]) > i-whichANT && i-whichANT > 0 {
+					fmt.Print("L")
+					fmt.Print(ants[j][whichANT])
+					fmt.Print("-")
+					fmt.Print(path[j][i-whichANT])
+					fmt.Print(" ")
+					if i-whichANT == len(path[j])-1 {
+						remaining--
+					}
+				}
+
+			}
+			whichANT++
+		}
+		fmt.Println()
+		if remaining == 0 {
+			break
+		}
+
+	}
 }
 
 //removes dead ends from function
 func removeDeadEnds(rawMap map[string][]string) map[string][]string {
-	// fmt.Println("rawMap: ", rawMap)
 	var err error
 
 	for key, value := range rawMap {
