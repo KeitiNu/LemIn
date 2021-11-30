@@ -57,6 +57,8 @@ func main() {
 		}
 	}
 
+	connected := false
+
 	remaining := numAnts
 	//Creating a infite loop that prints the required output and ends when var remaining is equal to 0
 	for i := 1; i > 0; i++ {
@@ -72,13 +74,25 @@ func main() {
 					if i-whichANT == len(path[j])-1 {
 						remaining--
 					}
+					if len(path[j]) == 2 {
+						connected = true
+					} else {
+						connected = false
+					}
 				}
 
 			}
 			whichANT++
 		}
-		fmt.Println()
+		if !connected {
+			fmt.Println()
+		}
+
 		if remaining == 0 {
+			if connected {
+				fmt.Println()
+			}
+
 			break
 		}
 
