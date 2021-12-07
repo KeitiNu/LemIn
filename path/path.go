@@ -165,7 +165,7 @@ func findBranchingPaths(middle1 []string, way [][]string, tempPath [][]string) [
 func formula(endroom string, option [][]string, ants int) ([][]string, []int, int) {
 
 	finished, distribution := moveAnts(option)
-	moves := len(option[len(option)-1])
+	moves := len(option[len(option)-1])-1
 
 	for _, arr := range option {
 		if len(arr)-1 > moves {
@@ -203,13 +203,18 @@ func formula(endroom string, option [][]string, ants int) ([][]string, []int, in
 			distribution[i]++
 			ants--
 			if ants == 0 {
+				fmt.Println(moves)
+				fmt.Println(distribution)
 				break
 			}
 
 			if ants > 0 && i == len(distribution)-1 {
 				fmt.Println(moves)
+				fmt.Println(distribution)
 				i = -1
 			} else if ants == 0 {
+				fmt.Println(moves)
+				fmt.Println(distribution)
 				break
 			}
 		}
