@@ -1,5 +1,7 @@
 package path
 
+import "fmt"
+
 var (
 	anthill = make(map[string][]string)
 	paths   [][]string
@@ -19,6 +21,8 @@ func Path(data map[string][]string, ants int) ([][]string, []int) {
 
 	var way [][]string
 	var distribution []int
+
+	fmt.Printf("%v\n\n", paths)
 
 	for end, options := range anthill {
 		if options[0] == "end" {
@@ -97,10 +101,12 @@ func filter(endroom string, ants int) ([][]string, []int) {
 
 		if len(rightWay) == 0 {
 			rightWay, rightDistribution, rightMoves = formula(endroom, way, ants)
-		} else {
-			newWay, newDistribution, newMoves := formula(endroom, way, ants)
-			if newMoves < rightMoves {
-				rightDistribution, rightMoves, rightWay = newDistribution, newMoves, newWay
+			fmt.Printf("Option saved for the first time: %v\n", rightWay)
+			} else {
+				newWay, newDistribution, newMoves := formula(endroom, way, ants)
+				if newMoves < rightMoves {
+					rightDistribution, rightMoves, rightWay = newDistribution, newMoves, newWay
+					fmt.Printf("Option saved: %v\n", rightWay)
 			}
 		}
 	}
@@ -144,6 +150,7 @@ func findBranchingPaths(middle1 []string, way [][]string) [][]string {
 func formula(endroom string, option [][]string, ants int) ([][]string, []int, int) {
 	for _, arr := range option {
 		if arr[len(arr)-1] != endroom {
+			fmt.Printf("breaking because endroom is not peter: %v\n", option)
 			return [][]string{}, []int{}, 5000
 		}
 	}
@@ -188,7 +195,7 @@ func formula(endroom string, option [][]string, ants int) ([][]string, []int, in
 				}
 			}
 
-			if ants >= 1 {
+			if ants > 0 {
 				if i == len(distribution)-1 {
 					moves++
 					i = 0
@@ -271,6 +278,7 @@ func subtraction(option [][]string, ants int, finished int, distribution []int, 
 		}
 	}
 	return option, distribution, moves
+
 }
 
 /*
