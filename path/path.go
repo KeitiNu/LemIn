@@ -1,7 +1,5 @@
 package path
 
-import "fmt"
-
 var (
 	anthill = make(map[string][]string)
 	paths   [][]string
@@ -21,8 +19,6 @@ func Path(data map[string][]string, ants int) ([][]string, []int) {
 
 	var way [][]string
 	var distribution []int
-
-	fmt.Printf("%v\n\n", paths)
 
 	for end, options := range anthill {
 		if options[0] == "end" {
@@ -86,7 +82,11 @@ func filter(endroom string, ants int) ([][]string, []int) {
 		}
 	}
 
+	var tempPath [][]string
+	tempPath = append(tempPath, paths...)
+
 	// searching for the right way...
+loop:
 	for _, short := range paths {
 
 		// if we find a road that's only 2 long,
@@ -97,16 +97,19 @@ func filter(endroom string, ants int) ([][]string, []int) {
 
 		// way is the path that will store the current path
 		// way := findBranchingPaths(short[1:len(short)-1], [][]string{short}, [][][]string{})
-		way := findBranchingPaths(short[1:len(short)-1], [][]string{short})
+		way := findBranchingPaths(short[1:len(short)-1], [][]string{short}, tempPath)
+		for _, arr := range way {
+			if arr[len(arr)-1] != endroom {
+				continue loop
+			}
+		}
 
-		if len(rightWay) == 0 {
+		if rightMoves < 1 {
 			rightWay, rightDistribution, rightMoves = formula(endroom, way, ants)
-			fmt.Printf("Option saved for the first time: %v\n", rightWay)
-			} else {
-				newWay, newDistribution, newMoves := formula(endroom, way, ants)
-				if newMoves < rightMoves {
-					rightDistribution, rightMoves, rightWay = newDistribution, newMoves, newWay
-					fmt.Printf("Option saved: %v\n", rightWay)
+		} else {
+			newWay, newDistribution, newMoves := formula(endroom, way, ants)
+			if newMoves < rightMoves {
+				rightDistribution, rightMoves, rightWay = newDistribution, newMoves, newWay
 			}
 		}
 	}
@@ -114,10 +117,10 @@ func filter(endroom string, ants int) ([][]string, []int) {
 	return rightWay, rightDistribution
 }
 
-func findBranchingPaths(middle1 []string, way [][]string) [][]string {
-	for _, long := range paths {
+func findBranchingPaths(middle1 []string, way [][]string, tempPath [][]string) [][]string {
+	var breaker bool
+	for _, long := range tempPath {
 		middle2 := long[1 : len(long)-1]
-		var breaker bool
 
 		for i, room1 := range middle1 {
 			// compared the paths
@@ -128,10 +131,7 @@ func findBranchingPaths(middle1 []string, way [][]string) [][]string {
 					break
 				}
 			}
-			if breaker { // breaking out of for ... path
-				break
-			}
-			if breaker { // breaking out of for ... middle1
+			if breaker {
 				breaker = false
 				break
 			}
@@ -139,7 +139,20 @@ func findBranchingPaths(middle1 []string, way [][]string) [][]string {
 			if i == len(middle1)-1 {
 				// If we made it all the way through without there being any matching rooms, then
 				way = append(way, long)
-				middle1 = append(middle1, middle2...) // middle2 get appended so future roads will not cross it's path
+				// middle1 = append(middle1, middle2...)
+				mid := make([]string, len(middle1)+len(middle2))
+				i := 0
+				for i < len(middle1) {
+					mid[i] = middle1[i]
+					i++
+				}
+
+				for j := 0; j < len(middle2); j++ {
+					mid[i] = middle2[j]
+					i++
+				}
+
+				middle1 = mid
 			}
 		}
 	}
@@ -148,20 +161,13 @@ func findBranchingPaths(middle1 []string, way [][]string) [][]string {
 
 // a formula to send the right amount of ants down each path, return the distribution and the move count
 func formula(endroom string, option [][]string, ants int) ([][]string, []int, int) {
-	for _, arr := range option {
-		if arr[len(arr)-1] != endroom {
-			fmt.Printf("breaking because endroom is not peter: %v\n", option)
-			return [][]string{}, []int{}, 5000
-		}
-	}
 
 	finished, distribution := moveAnts(option)
-	roadCount := len(option)
 	moves := len(option[len(option)-1])
 
 	for _, arr := range option {
 		if len(arr) > moves {
-			moves = len(arr)
+			moves = len(arr) - 1
 		}
 	}
 
@@ -178,30 +184,22 @@ func formula(endroom string, option [][]string, ants int) ([][]string, []int, in
 	ants = ants - finished
 
 	// middle/end : now that the uneven part is done then we
-	moves += ants / roadCount
 	base := make([]int, len(distribution))
 	copy(base, distribution)
 
 	if len(distribution) == 1 {
-		distribution[0] += ants / roadCount
+		distribution[0] += ants
 	} else {
-		i := 0
-		for i < len(distribution) {
-			for j := 0; j < base[i]; j++ {
-				distribution[i]++
-				ants--
-				if ants == 0 {
-					break
-				}
+		for i := 0; i < len(distribution); i++ {
+			distribution[i]++
+			ants--
+			if ants == 0 {
+				break
 			}
 
-			if ants > 0 {
-				if i == len(distribution)-1 {
-					moves++
-					i = 0
-				} else {
-					i++
-				}
+			if ants > 0 && i == len(distribution)-1 {
+				moves++
+				i = -1
 			} else if ants == 0 {
 				break
 			}
@@ -240,16 +238,6 @@ func moveAnts(way [][]string) (int, []int) {
 // if the way we distributed the ants is greater than the amount of ants we have
 // then we start subtracting them from te roads
 func subtraction(option [][]string, ants int, finished int, distribution []int, moves int) ([][]string, []int, int) {
-	// for i := 1; i < len(distribution); i++ {
-	// 	if i < 1 {
-	// 		continue
-	// 	} else if distribution[i] < distribution[i-1] {
-	// 		distribution[i], distribution[i-1] = distribution[i-1], distribution[i]
-	// 		option[i], option[i-1] = option[i-1], option[i]
-	// 		i -= 2
-	// 	}
-	// }
-
 	for i := len(distribution) - 1; i > -1; i-- {
 		distribution[i] -= 1
 		finished--
@@ -280,65 +268,3 @@ func subtraction(option [][]string, ants int, finished int, distribution []int, 
 	return option, distribution, moves
 
 }
-
-/*
-	ants = 100 - 3 = 97
-	moves = 0 + 5 = 5
-
-	[97 / 2 = 48]
-	moves = 5 + 48 = 53
-	ants = 97 % 2 = 2
-
-	if ants(2) > 0 {
-		moves++
-	}
-
-	to find the final amount of moves that's needed to finish.
-
-	first we need to find how many ants will finish by the time the longest ant takes to finish
-	we save these as 2 moves and 3 finished.
-
-	firstfinish = 3, longest road length = 5
-	ants = 100 moves = 0
-
-	100 - 3 = 97
-	moves = 0 + 5 = 5
-
-	ants = 97 moves = 5
-
-	now we have the base number of ants we will start working with. After the first iteration of ants is home,
-	then we just need to send one after the other down each path, meaning, if we divide the base number of ants
-	we got with how many roads we have, we have the middle part of the moving process done.
-
-	97 / 2 = 48
-	moves = 5 + 48 = 53
-	ants = 97 - 48 * 2 = 97-96 = 2
-*/
-
-// if number of rouths on < sipelgat arv - kasuta kõiki võimalikke teid ja kui sipelgate arv on sama või väiksem kui path siis kasutage kõige lühemat
-
-/*
-
-if 10
-2 	  = 2 liigutust - 1 = 5 liigutust - 4 = 6 liigutust - 5 = 7 liigutust - 6 = 8 liigutust - 7
-5 - 3 = 5 liigutust - 3 = 5 liigutust - 3 = 6 liigutust - 5 = 7 liigutust - 7 = 8 liigutust - 9
-
-100
-
-numberOfAnts - baseFinished
-resultOfPrevious / numpaths
-
-100 - 3 = 97
-97 / 2 = 48
-if 97 % 2 > 0 {
-	97 % 2 = 1
-	48 + 1 % 2 + 1 / 2 = 49
-}
-49 + 5 = 54
-
-100 - 1 = 99
-99 / 1 = 99
-if...
-99 + 2 = 101
-
-*/
