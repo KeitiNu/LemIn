@@ -39,6 +39,8 @@ func main() {
 	//Info about the paths and distribution from path.go
 	path, distribution := path.Path(croppedMap, numAnts)
 
+	fmt.Println(string(input) + "\n")
+
 	//func print(path [][]string, distribution []int, numAnts int) {
 	var ants [][]int
 	antNr := 1
