@@ -102,51 +102,6 @@ func main() {
 	}
 }
 
-func unfinishedprint(numAnts int, path [][]string, distribution []int) {
-	var answer []string
-	var start int
-	ant := 1
-
-	if len(path[0]) == 2 {
-		for i := 1; i < numAnts+1; i++ {
-			fmt.Print("L" + strconv.Itoa(i) + "-" + path[0][1] + " ")
-		}
-		return
-	}
-
-	for i := 0; i < len(distribution); i++ {
-		if distribution[i] < 1 {
-			if i == 0 {
-				break
-			} else {
-				continue
-			}
-		}
-
-		for j := 1; j < len(path[i]); j++ {
-			key := "L" + strconv.Itoa(ant) + "-" + path[i][j] + " "
-			if len(answer)-1 < start+j-1 {
-				answer = append(answer, key)
-			} else {
-				answer[start+j-1] += key
-			}
-		}
-
-		ant++
-		distribution[i]--
-
-		if i == len(distribution)-1 {
-			i = -1
-			start++
-		}
-	}
-
-	fmt.Println()
-	for _, v := range answer {
-		fmt.Println(v)
-	}
-}
-
 //removes dead ends from function
 func removeDeadEnds(rawMap map[string][]string) map[string][]string {
 	var err error
