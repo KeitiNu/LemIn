@@ -24,10 +24,10 @@ echo badexample01
 go run . badexample01.txt
 echo --------------------------------------
 echo example06 less than 1.5 min
-go run . example06.txt
+time go run . example06.txt
 echo --------------------------------------
 echo example07 less than 2.5 min
-go run . example07.txt
+time go run . example07.txt
 echo --------------------------------------
 echo randomtest
 go run . test.txt

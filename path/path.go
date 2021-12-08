@@ -1,7 +1,5 @@
 package path
 
-import "fmt"
-
 var (
 	anthill = make(map[string][]string)
 	paths   [][]string
@@ -165,15 +163,13 @@ func findBranchingPaths(middle1 []string, way [][]string, tempPath [][]string) [
 func formula(endroom string, option [][]string, ants int) ([][]string, []int, int) {
 
 	finished, distribution := moveAnts(option)
-	moves := len(option[len(option)-1])-1
+	moves := len(option[len(option)-1]) - 1
 
 	for _, arr := range option {
 		if len(arr)-1 > moves {
 			moves = len(arr) - 1
 		}
 	}
-
-	fmt.Printf("option: %v distribution: %v moves: %v\n", option, distribution, moves)
 
 	// if the way we distributed the ants is greater than the amount of ants we have...
 	// ...then we're fucked...
@@ -194,7 +190,6 @@ func formula(endroom string, option [][]string, ants int) ([][]string, []int, in
 	if len(distribution) == 1 {
 		distribution[0] += ants
 		moves += ants
-		fmt.Println(moves)
 	} else {
 		for i := 0; i < len(distribution); i++ {
 			if i == 0 {
@@ -203,18 +198,12 @@ func formula(endroom string, option [][]string, ants int) ([][]string, []int, in
 			distribution[i]++
 			ants--
 			if ants == 0 {
-				fmt.Println(moves)
-				fmt.Println(distribution)
 				break
 			}
 
 			if ants > 0 && i == len(distribution)-1 {
-				fmt.Println(moves)
-				fmt.Println(distribution)
 				i = -1
 			} else if ants == 0 {
-				fmt.Println(moves)
-				fmt.Println(distribution)
 				break
 			}
 		}

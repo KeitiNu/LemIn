@@ -32,15 +32,14 @@ func main() {
 	coordinatesMap := mapRoomCoordinates(locationData)
 	originalMap := mapRoomConnections(relationData, coordinatesMap) //unsorted map of rooms and relations
 	croppedMap := removeDeadEnds(originalMap)
+
+
 	//FINAL PRINTING
 
 	//Info about the paths and distribution from path.go
 	path, distribution := path.Path(croppedMap, numAnts)
 
-	fmt.Printf("\n%v\n%v\n\n", path, distribution)
-}
-
-func print(path [][]string, distribution []int, numAnts int) {
+	//func print(path [][]string, distribution []int, numAnts int) {
 	var ants [][]int
 	antNr := 1
 	//Creating a slice into var ants[][] that contains integers of how many ants there are
@@ -61,7 +60,6 @@ func print(path [][]string, distribution []int, numAnts int) {
 	}
 
 	connected := false
-
 	remaining := numAnts
 	//Creating a infite loop that prints the required output and ends when var remaining is equal to 0
 	for i := 1; i > 0; i++ {
